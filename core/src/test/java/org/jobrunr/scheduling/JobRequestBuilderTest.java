@@ -23,7 +23,7 @@ class JobRequestBuilderTest {
     @Test
     void testDefaultJob() {
         Job job = aJob()
-                .withDetails(jobRequest)
+                .withJobRequest(jobRequest)
                 .build();
 
         assertThat(job)
@@ -35,7 +35,7 @@ class JobRequestBuilderTest {
     void testWithJobName() {
         Job job = aJob()
                 .withName("My job name")
-                .withDetails(jobRequest)
+                .withJobRequest(jobRequest)
                 .build();
 
         assertThat(job)
@@ -47,7 +47,7 @@ class JobRequestBuilderTest {
     void testWithScheduleIn() {
         Job job = aJob()
                 .scheduleIn(Duration.ofMinutes(1))
-                .withDetails(jobRequest)
+                .withJobRequest(jobRequest)
                 .build();
 
         assertThat(job).hasState(StateName.SCHEDULED);
@@ -59,7 +59,7 @@ class JobRequestBuilderTest {
     void testWithScheduleAt() {
         Job job = aJob()
                 .scheduleAt(Instant.now().plusSeconds(60))
-                .withDetails(jobRequest)
+                .withJobRequest(jobRequest)
                 .build();
 
         assertThat(job).hasState(StateName.SCHEDULED);
@@ -73,7 +73,7 @@ class JobRequestBuilderTest {
 
         Job job = aJob()
                 .withAmountOfRetries(amountOfRetries)
-                .withDetails(jobRequest)
+                .withJobRequest(jobRequest)
                 .build();
 
         assertThat(job)

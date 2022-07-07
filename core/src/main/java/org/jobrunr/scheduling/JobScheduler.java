@@ -61,6 +61,7 @@ public class JobScheduler extends AbstractJobScheduler {
         BackgroundJob.setJobScheduler(this);
     }
 
+
     public JobId create(JobBuilder jobBuilder) {
         return saveJob(jobBuilder.build(jobDetailsGenerator));
     }
