@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.jobrunr.JobRunrAssertions.assertThat;
 import static org.jobrunr.jobs.JobDetailsTestBuilder.jobDetails;
 import static org.jobrunr.jobs.JobDetailsTestBuilder.systemOutPrintLnJobDetails;
 import static org.jobrunr.jobs.JobTestBuilder.anEnqueuedJob;
@@ -22,9 +24,70 @@ class DefaultJobFilterTest {
     }
 
     @Test
+    void testDisplayNameIsUsedIfProvidedByJobBuilder() {
+        Job job = anEnqueuedJob()
+                .withName("My job name")
+                .withJobDetails(jobDetails()
+                        .withClassName(TestService.class)
+                        .withMethodName("doWork")
+                        .withJobParameter(2))
+                .build();
+
+        defaultJobFilter.onCreating(job);
+
+        assertThat(job).hasJobName("My job name");
+    }
+
+    @Test
+    void testDisplayNameExceptionIsThrownIfJobBuilderIsUsedWithAnnotation() {
+        Job job = anEnqueuedJob()
+                .withName("My job name")
+                .withJobDetails(jobDetails()
+                        .withClassName(TestService.class)
+                        .withMethodName("doWorkWithAnnotation")
+                        .withJobParameter(5)
+                        .withJobParameter("John Doe"))
+                .build();
+
+        assertThatThrownBy(() -> defaultJobFilter.onCreating(job))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("You are combining the JobBuilder with the Job annotation. You can only use one of them.");
+    }
+
+    @Test
+    void testAmountOfRetriesIsUsedIfProvidedByJobBuilder() {
+        Job job = anEnqueuedJob()
+                .withAmountOfRetries(3)
+                .withJobDetails(jobDetails()
+                        .withClassName(TestService.class)
+                        .withMethodName("doWork")
+                        .withJobParameter(2))
+                .build();
+
+        defaultJobFilter.onCreating(job);
+
+        assertThat(job).hasAmountOfRetries(3);
+    }
+
+    @Test
+    void testAmountOfRetriesExceptionIsThrownIfJobBuilderIsUsedWithAnnotation() {
+        Job job = anEnqueuedJob()
+                .withAmountOfRetries(3)
+                .withJobDetails(jobDetails()
+                        .withClassName(TestService.class)
+                        .withMethodName("doWorkThatFails"))
+                .build();
+
+        assertThatThrownBy(() -> defaultJobFilter.onCreating(job))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("You are combining the JobBuilder with the Job annotation. You can only use one of them.");
+    }
+
+    @Test
     void testDisplayNameWithAnnotationUsingJobParametersAndMDCVariables() {
         MDC.put("customer.id", "1");
         Job job = anEnqueuedJob()
+                .withoutName()
                 .withJobDetails(jobDetails()
                         .withClassName(TestService.class)
                         .withMethodName("doWorkWithAnnotation")
@@ -41,6 +104,7 @@ class DefaultJobFilterTest {
     void testDisplayNameWithAnnotationUsingJobParametersAndMDCVariablesThatDoNotExist() {
         MDC.put("key-not-used-in-annotation", "1");
         Job job = anEnqueuedJob()
+                .withoutName()
                 .withJobDetails(jobDetails()
                         .withClassName(TestService.class)
                         .withMethodName("doWorkWithAnnotation")
@@ -56,6 +120,7 @@ class DefaultJobFilterTest {
     @Test
     void testDisplayNameFromJobDetailsNormalMethod() {
         Job job = anEnqueuedJob()
+                .withoutName()
                 .withJobDetails(jobDetails()
                         .withClassName(TestService.class)
                         .withMethodName("doWork")
@@ -70,6 +135,7 @@ class DefaultJobFilterTest {
     @Test
     void testDisplayNameFromJobDetailsStaticMethod() {
         Job job = anEnqueuedJob()
+                .withoutName()
                 .withJobDetails(systemOutPrintLnJobDetails("some message"))
                 .build();
 
@@ -81,6 +147,7 @@ class DefaultJobFilterTest {
     @Test
     void testDisplayNameFilterAlsoWorksWithJobContext() {
         Job job = anEnqueuedJob()
+                .withoutName()
                 .withJobDetails(jobDetails()
                         .withClassName(TestService.class)
                         .withMethodName("doWorkWithAnnotationAndJobContext")

@@ -28,16 +28,20 @@ public class DefaultJobFilter implements JobClientFilter {
 
     private void setJobName(AbstractJob job, Optional<Job> jobAnnotation) {
         Optional<String> jobNameFromAnnotation = getFromAnnotation(jobAnnotation, Job::name);
-        if (jobNameFromAnnotation.isPresent()) {
+        if (job.getJobName() != null && jobNameFromAnnotation.isPresent()) {
+            throw new IllegalStateException("You are combining the JobBuilder with the Job annotation. You can only use one of them.");
+        } else if (job.getJobName() == null && jobNameFromAnnotation.isPresent()) {
             job.setJobName(resolveParameters(jobNameFromAnnotation.get(), job));
-        } else {
+        } else if (job.getJobName() == null) {
             job.setJobName(getReadableNameFromJobDetails(job.getJobDetails()));
         }
     }
 
     private void setAmountOfRetries(AbstractJob job, Optional<Job> jobAnnotation) {
         Optional<Integer> amountOfRetriesFromAnnotation = getIntegerFromAnnotation(jobAnnotation, Job::retries);
-        if (amountOfRetriesFromAnnotation.isPresent()) {
+        if (job.getAmountOfRetries() != null && amountOfRetriesFromAnnotation.isPresent()) {
+            throw new IllegalStateException("You are combining the JobBuilder with the Job annotation. You can only use one of them.");
+        } else if(amountOfRetriesFromAnnotation.isPresent()) {
             job.setAmountOfRetries(amountOfRetriesFromAnnotation.get());
         }
     }

@@ -69,7 +69,7 @@ class JobBuilderTest {
 
         assertThat(job).hasState(StateName.SCHEDULED);
         ScheduledState scheduledState = job.getJobState();
-        assertThat(scheduledState.getScheduledAt()).isCloseTo(now().plusSeconds(60), within(200, MILLIS));
+        assertThat(scheduledState.getScheduledAt()).isCloseTo(now().plusSeconds(60), within(500, MILLIS));
     }
 
     @Test
@@ -81,7 +81,7 @@ class JobBuilderTest {
 
         assertThat(job).hasState(StateName.SCHEDULED);
         ScheduledState scheduledState = job.getJobState();
-        assertThat(scheduledState.getScheduledAt()).isCloseTo(now().plusSeconds(60), within(200, MILLIS));
+        assertThat(scheduledState.getScheduledAt()).isCloseTo(now().plusSeconds(60), within(500, MILLIS));
     }
 
     @Test
