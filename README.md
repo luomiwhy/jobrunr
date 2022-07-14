@@ -1,4 +1,4 @@
-[ ] add namespace to separate jobs of different microservices
+[ ] add namespace to separate jobs of different microservices (only sql)
 
 -----
 
