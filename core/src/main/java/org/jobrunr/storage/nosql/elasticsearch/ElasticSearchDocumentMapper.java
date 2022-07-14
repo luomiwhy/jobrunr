@@ -142,8 +142,8 @@ public class ElasticSearchDocumentMapper {
                 autobox(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_MAX_MEMORY), long.class),
                 autobox(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_FREE_MEMORY), long.class),
                 autobox(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_ALLOCATED_MEMORY), long.class),
-                autobox(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_CPU_LOAD), double.class)
-        );
+                autobox(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_CPU_LOAD), double.class),
+                autobox(fieldMap.get(BackgroundJobServers.FIELD_NAMESPACE), String.class));
     }
 
     public JobRunrMetadata toMetadata(SearchHit searchHit) {

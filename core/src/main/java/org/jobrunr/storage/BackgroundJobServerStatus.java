@@ -23,12 +23,13 @@ public class BackgroundJobServerStatus implements BackgroundJobServerStatusMBean
     private final Long processFreeMemory;
     private final Long processAllocatedMemory;
     private final Double processCpuLoad;
+    private final String namespace;
 
-    public BackgroundJobServerStatus(int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter) {
-        this(UUID.randomUUID(), workerPoolSize, pollIntervalInSeconds, deleteSucceededJobsAfter, permanentlyDeleteDeletedJobsAfter, null, null, false, null, null, null, null, null, null, null);
+    public BackgroundJobServerStatus(int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, String namespace) {
+        this(UUID.randomUUID(), workerPoolSize, pollIntervalInSeconds, deleteSucceededJobsAfter, permanentlyDeleteDeletedJobsAfter, null, null, false, null, null, null, null, null, null, null, namespace);
     }
 
-    public BackgroundJobServerStatus(UUID id, int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, Instant firstHeartbeat, Instant lastHeartbeat, boolean isRunning, Long systemTotalMemory, Long systemFreeMemory, Double systemCpuLoad, Long processMaxMemory, Long processFreeMemory, Long processAllocatedMemory, Double processCpuLoad) {
+    public BackgroundJobServerStatus(UUID id, int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, Instant firstHeartbeat, Instant lastHeartbeat, boolean isRunning, Long systemTotalMemory, Long systemFreeMemory, Double systemCpuLoad, Long processMaxMemory, Long processFreeMemory, Long processAllocatedMemory, Double processCpuLoad, String namespace) {
         this.id = id;
         this.workerPoolSize = workerPoolSize;
         this.pollIntervalInSeconds = pollIntervalInSeconds;
@@ -44,6 +45,7 @@ public class BackgroundJobServerStatus implements BackgroundJobServerStatusMBean
         this.processFreeMemory = processFreeMemory;
         this.processAllocatedMemory = processAllocatedMemory;
         this.processCpuLoad = processCpuLoad;
+        this.namespace = namespace;
     }
 
     @Override
@@ -119,5 +121,9 @@ public class BackgroundJobServerStatus implements BackgroundJobServerStatusMBean
     @Override
     public Double getProcessCpuLoad() {
         return processCpuLoad;
+    }
+
+    public String getNamespace() {
+        return namespace;
     }
 }

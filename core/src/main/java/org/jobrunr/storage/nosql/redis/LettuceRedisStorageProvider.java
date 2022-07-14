@@ -172,8 +172,8 @@ public class LettuceRedisStorageProvider extends AbstractStorageProvider impleme
                             parseLong(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_MAX_MEMORY)),
                             parseLong(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_FREE_MEMORY)),
                             parseLong(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_ALLOCATED_MEMORY)),
-                            Double.parseDouble(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_CPU_LOAD))
-                    ))
+                            Double.parseDouble(fieldMap.get(BackgroundJobServers.FIELD_PROCESS_CPU_LOAD)),
+                            fieldMap.get(BackgroundJobServers.FIELD_NAMESPACE)))
                     .collect(toList());
         }
     }

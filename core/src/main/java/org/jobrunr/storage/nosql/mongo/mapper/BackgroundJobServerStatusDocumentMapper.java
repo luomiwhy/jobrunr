@@ -60,7 +60,7 @@ public class BackgroundJobServerStatusDocumentMapper {
                 document.getLong(FIELD_PROCESS_MAX_MEMORY),
                 document.getLong(FIELD_PROCESS_FREE_MEMORY),
                 document.getLong(FIELD_PROCESS_ALLOCATED_MEMORY),
-                document.getDouble(FIELD_PROCESS_CPU_LOAD)
-        );
+                document.getDouble(FIELD_PROCESS_CPU_LOAD),
+                document.getString(FIELD_NAMESPACE));
     }
 }

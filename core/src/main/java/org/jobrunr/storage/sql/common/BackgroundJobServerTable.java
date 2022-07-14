@@ -1,6 +1,7 @@
 package org.jobrunr.storage.sql.common;
 
 import org.jobrunr.storage.BackgroundJobServerStatus;
+import org.jobrunr.storage.Namespace;
 import org.jobrunr.storage.ServerTimedOutException;
 import org.jobrunr.storage.StorageException;
 import org.jobrunr.storage.sql.common.db.ConcurrentSqlModificationException;
@@ -37,7 +38,8 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
                 .with(FIELD_PROCESS_MAX_MEMORY, BackgroundJobServerStatus::getProcessMaxMemory)
                 .with(FIELD_PROCESS_FREE_MEMORY, BackgroundJobServerStatus::getProcessFreeMemory)
                 .with(FIELD_PROCESS_ALLOCATED_MEMORY, BackgroundJobServerStatus::getProcessAllocatedMemory)
-                .with(FIELD_PROCESS_CPU_LOAD, BackgroundJobServerStatus::getProcessCpuLoad);
+                .with(FIELD_PROCESS_CPU_LOAD, BackgroundJobServerStatus::getProcessCpuLoad)
+                .with(FIELD_NAMESPACE, BackgroundJobServerStatus::getNamespace);
     }
 
     public void announce(BackgroundJobServerStatus serverStatus) throws SQLException {
@@ -45,7 +47,10 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
                 .with(FIELD_ID, serverStatus.getId())
                 .delete("from jobrunr_backgroundjobservers where id = :id");
         this
-                .insert(serverStatus, "into jobrunr_backgroundjobservers values (:id, :workerPoolSize, :pollIntervalInSeconds, :firstHeartbeat, :lastHeartbeat, :running, :systemTotalMemory, :systemFreeMemory, :systemCpuLoad, :processMaxMemory, :processFreeMemory, :processAllocatedMemory, :processCpuLoad, :deleteSucceededJobsAfter, :permanentlyDeleteJobsAfter)");
+                .insert(serverStatus, "into jobrunr_backgroundjobservers values (:id, :workerPoolSize, :pollIntervalInSeconds," +
+                        " :firstHeartbeat, :lastHeartbeat, :running, :systemTotalMemory, :systemFreeMemory, :systemCpuLoad," +
+                        " :processMaxMemory, :processFreeMemory, :processAllocatedMemory, :processCpuLoad, :deleteSucceededJobsAfter," +
+                        " :permanentlyDeleteJobsAfter, :namespace)");
     }
 
     public boolean signalServerAlive(BackgroundJobServerStatus serverStatus) throws SQLException {
@@ -92,7 +97,7 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
 
     public UUID getLongestRunningBackgroundJobServerId() {
         return withOrderLimitAndOffset("firstHeartbeat ASC", 1, 0)
-                .select("id from jobrunr_backgroundjobservers")
+                .select("id from jobrunr_backgroundjobservers where " + Namespace.getWhereClause())
                 .map(sqlResultSet -> sqlResultSet.asUUID(FIELD_ID))
                 .findFirst()
                 .orElseThrow(() -> shouldNotHappenException("No servers available?!"));
@@ -114,8 +119,9 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
                 resultSet.asLong(FIELD_PROCESS_MAX_MEMORY),
                 resultSet.asLong(FIELD_PROCESS_FREE_MEMORY),
                 resultSet.asLong(FIELD_PROCESS_ALLOCATED_MEMORY),
-                resultSet.asDouble(FIELD_PROCESS_CPU_LOAD)
-        );
+                resultSet.asDouble(FIELD_PROCESS_CPU_LOAD),
+                resultSet.asString(FIELD_NAMESPACE)
+                );
     }
 
 

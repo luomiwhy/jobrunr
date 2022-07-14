@@ -1,5 +1,6 @@
 package org.jobrunr.storage.sql.common.db;
 
+import org.jobrunr.storage.Namespace;
 import org.jobrunr.storage.sql.common.db.dialect.Dialect;
 
 import java.sql.*;

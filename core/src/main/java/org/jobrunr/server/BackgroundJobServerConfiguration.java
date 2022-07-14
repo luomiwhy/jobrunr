@@ -1,6 +1,7 @@
 package org.jobrunr.server;
 
 import org.jobrunr.server.configuration.*;
+import org.jobrunr.storage.Namespace;
 
 import java.time.Duration;
 
@@ -22,6 +23,7 @@ public class BackgroundJobServerConfiguration {
     Duration permanentlyDeleteDeletedJobsAfter = DEFAULT_PERMANENTLY_DELETE_JOBS_DURATION;
     BackgroundJobServerWorkerPolicy backgroundJobServerWorkerPolicy = new DefaultBackgroundJobServerWorkerPolicy();
     ConcurrentJobModificationPolicy concurrentJobModificationPolicy = new DefaultConcurrentJobModificationPolicy();
+    Namespace namespace;
 
     private BackgroundJobServerConfiguration() {
 
@@ -138,6 +140,11 @@ public class BackgroundJobServerConfiguration {
      */
     public BackgroundJobServerConfiguration andConcurrentJobModificationPolicy(ConcurrentJobModificationPolicy concurrentJobModificationPolicy) {
         this.concurrentJobModificationPolicy = concurrentJobModificationPolicy;
+        return this;
+    }
+
+    public BackgroundJobServerConfiguration andNamespace(String namespace) {
+        this.namespace = Namespace.of(namespace);
         return this;
     }
 }

@@ -18,6 +18,7 @@ public class BackgroundJobServerStatusTestBuilder {
     private Instant firstHeartbeat;
     private Instant lastHeartbeat;
     private boolean running;
+    private String namespace;
 
     private BackgroundJobServerStatusTestBuilder() {
 
@@ -83,6 +84,6 @@ public class BackgroundJobServerStatusTestBuilder {
         return new BackgroundJobServerStatus(id, workerPoolSize, pollIntervalInSeconds,
                 deleteSucceededJobsAfter, permanentlyDeleteDeletedJobsAfter, firstHeartbeat, lastHeartbeat, running,
                 jobServerStats.getSystemTotalMemory(), jobServerStats.getSystemFreeMemory(), jobServerStats.getSystemCpuLoad(), jobServerStats.getProcessMaxMemory(),
-                jobServerStats.getProcessFreeMemory(), jobServerStats.getProcessAllocatedMemory(), jobServerStats.getProcessCpuLoad());
+                jobServerStats.getProcessFreeMemory(), jobServerStats.getProcessAllocatedMemory(), jobServerStats.getProcessCpuLoad(), namespace);
     }
 }
