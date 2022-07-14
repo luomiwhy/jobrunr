@@ -21,7 +21,9 @@ import static org.jobrunr.storage.StorageProviderUtils.BackgroundJobServers.*;
 
 public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
 
-    public BackgroundJobServerTable(Connection connection, Dialect dialect, String tablePrefix) {
+    private final Namespace namespace;
+    public BackgroundJobServerTable(Connection connection, Dialect dialect, String tablePrefix, Namespace namespace) {
+        this.namespace = namespace;
         this
                 .using(connection, dialect, tablePrefix, "jobrunr_backgroundjobservers")
                 .with(FIELD_ID, BackgroundJobServerStatus::getId)
@@ -40,6 +42,11 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
                 .with(FIELD_PROCESS_ALLOCATED_MEMORY, BackgroundJobServerStatus::getProcessAllocatedMemory)
                 .with(FIELD_PROCESS_CPU_LOAD, BackgroundJobServerStatus::getProcessCpuLoad)
                 .with(FIELD_NAMESPACE, BackgroundJobServerStatus::getNamespace);
+    }
+
+    public BackgroundJobServerTable withNamespace() {
+        with("namespace", namespace.getName());
+        return this;
     }
 
     public void announce(BackgroundJobServerStatus serverStatus) throws SQLException {
@@ -90,14 +97,17 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
     }
 
     public List<BackgroundJobServerStatus> getAll() {
-        return select("* from jobrunr_backgroundjobservers order by firstHeartbeat")
+        return withNamespace()
+                .select("* from jobrunr_backgroundjobservers " + Namespace.whereClause() + " and order by firstHeartbeat")
                 .map(this::toBackgroundJobServerStatus)
                 .collect(toList());
     }
 
     public UUID getLongestRunningBackgroundJobServerId() {
-        return withOrderLimitAndOffset("firstHeartbeat ASC", 1, 0)
-                .select("id from jobrunr_backgroundjobservers where " + Namespace.getWhereClause())
+        // todo 需要加入lastHeartbeat的where条件（可能出现有job server停了，但是没删掉的情况）
+        return withNamespace()
+                .withOrderLimitAndOffset("firstHeartbeat ASC", 1, 0)
+                .select("id from jobrunr_backgroundjobservers " + Namespace.whereClause())
                 .map(sqlResultSet -> sqlResultSet.asUUID(FIELD_ID))
                 .findFirst()
                 .orElseThrow(() -> shouldNotHappenException("No servers available?!"));

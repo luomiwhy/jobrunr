@@ -5,6 +5,7 @@ import org.jobrunr.jobs.mappers.JobMapper;
 import org.jobrunr.jobs.states.ScheduledState;
 import org.jobrunr.jobs.states.StateName;
 import org.jobrunr.storage.ConcurrentJobModificationException;
+import org.jobrunr.storage.Namespace;
 import org.jobrunr.storage.PageRequest;
 import org.jobrunr.storage.sql.common.db.ConcurrentSqlModificationException;
 import org.jobrunr.storage.sql.common.db.Sql;
@@ -31,18 +32,21 @@ import static org.jobrunr.utils.reflection.ReflectionUtils.cast;
 
 public class JobTable extends Sql<Job> {
 
+    private final Namespace namespace;
     private final JobMapper jobMapper;
     private static final SqlPageRequestMapper pageRequestMapper = new SqlPageRequestMapper();
 
-    public JobTable(Connection connection, Dialect dialect, String tablePrefix, JobMapper jobMapper) {
+    public JobTable(Connection connection, Dialect dialect, String tablePrefix, JobMapper jobMapper, Namespace namespace) {
         this.jobMapper = jobMapper;
+        this.namespace = namespace;
         this
                 .using(connection, dialect, tablePrefix, "jobrunr_jobs")
                 .withVersion(AbstractJob::getVersion)
                 .with(FIELD_JOB_AS_JSON, jobMapper::serializeJob)
                 .with(FIELD_JOB_SIGNATURE, JobUtils::getJobSignature)
                 .with(FIELD_SCHEDULED_AT, job -> job.hasState(StateName.SCHEDULED) ? job.<ScheduledState>getJobState().getScheduledAt() : null)
-                .with(FIELD_RECURRING_JOB_ID, job -> job.getRecurringJobId().orElse(null));
+                .with(FIELD_RECURRING_JOB_ID, job -> job.getRecurringJobId().orElse(null))
+                .with(FIELD_NAMESPACE, Job::getNamespace);
     }
 
     public JobTable withId(UUID id) {
@@ -62,6 +66,11 @@ public class JobTable extends Sql<Job> {
 
     public JobTable withUpdatedBefore(Instant updatedBefore) {
         with("updatedBefore", updatedBefore);
+        return this;
+    }
+
+    public JobTable withNamespace() {
+        with("namespace", namespace.getName());
         return this;
     }
 
@@ -113,7 +122,8 @@ public class JobTable extends Sql<Job> {
     public List<Job> selectJobsByState(StateName state, PageRequest pageRequest) {
         return withState(state)
                 .withOrderLimitAndOffset(pageRequestMapper.map(pageRequest), pageRequest.getLimit(), pageRequest.getOffset())
-                .selectJobs("jobAsJson from jobrunr_jobs where state = :state")
+                .withNamespace()
+                .selectJobs("jobAsJson from jobrunr_jobs where state = :state" + Namespace.andClause())
                 .collect(toList());
     }
 
@@ -121,14 +131,16 @@ public class JobTable extends Sql<Job> {
         return withState(state)
                 .withUpdatedBefore(updatedBefore)
                 .withOrderLimitAndOffset(pageRequestMapper.map(pageRequest), pageRequest.getLimit(), pageRequest.getOffset())
-                .selectJobs("jobAsJson from jobrunr_jobs where state = :state AND updatedAt <= :updatedBefore")
+                .withNamespace()
+                .selectJobs("jobAsJson from jobrunr_jobs where state = :state AND updatedAt <= :updatedBefore" + Namespace.andClause())
                 .collect(toList());
     }
 
     public List<Job> selectJobsScheduledBefore(Instant scheduledBefore, PageRequest pageRequest) {
         return withScheduledAt(scheduledBefore)
                 .withOrderLimitAndOffset(pageRequestMapper.map(pageRequest), pageRequest.getLimit(), pageRequest.getOffset())
-                .selectJobs("jobAsJson from jobrunr_jobs where state = 'SCHEDULED' and scheduledAt <= :scheduledAt")
+                .withNamespace()
+                .selectJobs("jobAsJson from jobrunr_jobs where state = 'SCHEDULED' and scheduledAt <= :scheduledAt" + Namespace.andClause())
                 .collect(toList());
     }
 
@@ -165,7 +177,7 @@ public class JobTable extends Sql<Job> {
     }
 
     void insertOneJob(Job jobToSave) throws SQLException {
-        insert(jobToSave, "into jobrunr_jobs values (:id, :version, :jobAsJson, :jobSignature, :state, :createdAt, :updatedAt, :scheduledAt, :recurringJobId)");
+        insert(jobToSave, "into jobrunr_jobs values (:id, :version, :jobAsJson, :jobSignature, :state, :createdAt, :updatedAt, :scheduledAt, :recurringJobId, :namespace)");
     }
 
     void updateOneJob(Job jobToSave) throws SQLException {
@@ -173,7 +185,7 @@ public class JobTable extends Sql<Job> {
     }
 
     void insertAllJobs(List<Job> jobs) throws SQLException {
-        insertAll(jobs, "into jobrunr_jobs values (:id, :version, :jobAsJson, :jobSignature, :state, :createdAt, :updatedAt, :scheduledAt, :recurringJobId)");
+        insertAll(jobs, "into jobrunr_jobs values (:id, :version, :jobAsJson, :jobSignature, :state, :createdAt, :updatedAt, :scheduledAt, :recurringJobId, :namespace)");
     }
 
     void updateAllJobs(List<Job> jobs) throws SQLException {

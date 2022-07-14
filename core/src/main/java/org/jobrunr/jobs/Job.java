@@ -5,6 +5,7 @@ import org.jobrunr.jobs.context.JobDashboardProgressBar;
 import org.jobrunr.jobs.states.*;
 import org.jobrunr.server.BackgroundJobServer;
 import org.jobrunr.storage.ConcurrentJobModificationException;
+import org.jobrunr.storage.Namespace;
 import org.jobrunr.utils.streams.StreamUtils;
 
 import java.time.Duration;
@@ -28,36 +29,39 @@ public class Job extends AbstractJob {
     private final ArrayList<JobState> jobHistory;
     private final ConcurrentMap<String, Object> metadata;
     private String recurringJobId;
+    private final String namespace;
 
     private Job() {
         // used for deserialization
         this.id = null;
         this.jobHistory = new ArrayList<>();
         this.metadata = new ConcurrentHashMap<>();
+        this.namespace = Namespace.defaultNamespaceName();
     }
 
-    public Job(JobDetails jobDetails) {
-        this(jobDetails, new EnqueuedState());
+    public Job(JobDetails jobDetails, String namespace) {
+        this(jobDetails, new EnqueuedState(), namespace);
     }
 
-    public Job(UUID id, JobDetails jobDetails) {
-        this(id, jobDetails, new EnqueuedState());
+    public Job(UUID id, JobDetails jobDetails, String namespace) {
+        this(id, jobDetails, new EnqueuedState(), namespace);
     }
 
-    public Job(JobDetails jobDetails, JobState jobState) {
-        this(null, 0, jobDetails, singletonList(jobState), new ConcurrentHashMap<>());
+    public Job(JobDetails jobDetails, JobState jobState, String namespace) {
+        this(null, 0, jobDetails, singletonList(jobState), new ConcurrentHashMap<>(), namespace);
     }
 
-    public Job(UUID id, JobDetails jobDetails, JobState jobState) {
-        this(id, 0, jobDetails, singletonList(jobState), new ConcurrentHashMap<>());
+    public Job(UUID id, JobDetails jobDetails, JobState jobState, String namespace) {
+        this(id, 0, jobDetails, singletonList(jobState), new ConcurrentHashMap<>(), namespace);
     }
 
-    public Job(UUID id, int version, JobDetails jobDetails, List<JobState> jobHistory, ConcurrentMap<String, Object> metadata) {
+    public Job(UUID id, int version, JobDetails jobDetails, List<JobState> jobHistory, ConcurrentMap<String, Object> metadata, String namespace) {
         super(jobDetails, version);
         if (jobHistory.isEmpty()) throw new IllegalStateException("A job should have at least one initial state");
         this.id = id != null ? id : UUID.randomUUID();
         this.jobHistory = new ArrayList<>(jobHistory);
         this.metadata = metadata;
+        this.namespace = namespace;
     }
 
     @Override
@@ -179,5 +183,9 @@ public class Job extends AbstractJob {
 
     private void clearMetadata() {
         metadata.entrySet().removeIf(entry -> !(entry.getKey().matches("(\\b" + JobDashboardLogger.JOBRUNR_LOG_KEY + "\\b|\\b" + JobDashboardProgressBar.JOBRUNR_PROGRESSBAR_KEY + "\\b)-(\\d)")));
+    }
+
+    public String getNamespace() {
+        return namespace;
     }
 }

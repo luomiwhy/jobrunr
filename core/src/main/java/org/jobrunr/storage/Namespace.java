@@ -1,5 +1,7 @@
 package org.jobrunr.storage;
 
+import org.jobrunr.utils.StringUtils;
+
 public class Namespace {
     private final String name;
 
@@ -12,10 +14,17 @@ public class Namespace {
     }
 
     public static Namespace of(String name) {
-        return new Namespace(name);
+        return new Namespace(StringUtils.isNullOrEmpty(name) ? defaultNamespaceName() : name);
     }
 
-    public static String getWhereClause() {
-        return "namespace = :namespace";
+    public static String defaultNamespaceName() {
+        return "default";
+    }
+
+    public static String andClause() {
+        return " and namespace = :namespace ";
+    }
+    public static String whereClause() {
+        return " where namespace = :namespace ";
     }
 }

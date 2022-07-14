@@ -68,7 +68,7 @@ public class JobAdapter implements JsonbAdapter<Job, JsonObject> {
         final List<JobState> jobHistory = jobHistoryAdapter.adaptFromJson(jsonObject.getJsonArray("jobHistory"));
         final ConcurrentHashMap<String, Object> jobMetadata = jobMetadataAdapter.adaptFromJson(jsonObject.getJsonObject("metadata"));
 
-        final Job job = new Job(id, version, jobDetails, jobHistory, jobMetadata);
+        final Job job = new Job(id, version, jobDetails, jobHistory, jobMetadata, );
         job.setJobName(jsonObject.getString("jobName"));
         job.setRecurringJobId(jsonObject.containsKey("recurringJobId") && !jsonObject.isNull("recurringJobId") ? jsonObject.getString("recurringJobId") : null);
         return job;

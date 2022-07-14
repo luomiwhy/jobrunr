@@ -32,24 +32,26 @@ public class DefaultSqlStorageProvider extends AbstractStorageProvider implement
     protected final Dialect dialect;
     protected final String tablePrefix;
     private JobMapper jobMapper;
+    private Namespace namespace;
 
-    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, DatabaseOptions databaseOptions) {
-        this(dataSource, dialect, databaseOptions, rateLimit().at1Request().per(SECOND));
+    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, DatabaseOptions databaseOptions, Namespace namespace) {
+        this(dataSource, dialect, databaseOptions, rateLimit().at1Request().per(SECOND), namespace);
     }
 
-    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, String tablePrefix, DatabaseOptions databaseOptions) {
-        this(dataSource, dialect, tablePrefix, databaseOptions, rateLimit().at1Request().per(SECOND));
+    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, String tablePrefix, DatabaseOptions databaseOptions, Namespace namespace) {
+        this(dataSource, dialect, tablePrefix, databaseOptions, rateLimit().at1Request().per(SECOND), namespace);
     }
 
-    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, DatabaseOptions databaseOptions, RateLimiter changeListenerNotificationRateLimit) {
-        this(dataSource, dialect, null, databaseOptions, changeListenerNotificationRateLimit);
+    public DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, DatabaseOptions databaseOptions, RateLimiter changeListenerNotificationRateLimit, Namespace namespace) {
+        this(dataSource, dialect, null, databaseOptions, changeListenerNotificationRateLimit, namespace);
     }
 
-    DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, String tablePrefix, DatabaseOptions databaseOptions, RateLimiter changeListenerNotificationRateLimit) {
+    DefaultSqlStorageProvider(DataSource dataSource, Dialect dialect, String tablePrefix, DatabaseOptions databaseOptions, RateLimiter changeListenerNotificationRateLimit, Namespace namespace) {
         super(changeListenerNotificationRateLimit);
         this.dataSource = dataSource;
         this.dialect = dialect;
         this.tablePrefix = tablePrefix;
+        this.namespace = namespace;
         setUpStorageProvider(databaseOptions);
     }
 
@@ -372,7 +374,7 @@ public class DefaultSqlStorageProvider extends AbstractStorageProvider implement
     }
 
     protected JobTable jobTable(Connection connection) {
-        return new JobTable(connection, dialect, tablePrefix, jobMapper);
+        return new JobTable(connection, dialect, tablePrefix, jobMapper, namespace);
     }
 
     protected RecurringJobTable recurringJobTable(Connection connection) {
@@ -380,7 +382,7 @@ public class DefaultSqlStorageProvider extends AbstractStorageProvider implement
     }
 
     protected BackgroundJobServerTable backgroundJobServerTable(Connection connection) {
-        return new BackgroundJobServerTable(connection, dialect, tablePrefix);
+        return new BackgroundJobServerTable(connection, dialect, tablePrefix, namespace);
     }
 
     protected MetadataTable metadataTable(Connection connection) {
