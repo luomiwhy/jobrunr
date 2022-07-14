@@ -36,7 +36,7 @@ public class Job extends AbstractJob {
         this.id = null;
         this.jobHistory = new ArrayList<>();
         this.metadata = new ConcurrentHashMap<>();
-        this.namespace = Namespace.defaultNamespaceName();
+        this.namespace = Namespace.DEFAULT_NAME;
     }
 
     public Job(JobDetails jobDetails, String namespace) {

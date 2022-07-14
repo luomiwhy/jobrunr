@@ -7,6 +7,7 @@ import org.jobrunr.jobs.states.AbstractJobState;
 import org.jobrunr.jobs.states.EnqueuedState;
 import org.jobrunr.jobs.states.ProcessingState;
 import org.jobrunr.jobs.states.ScheduledState;
+import org.jobrunr.storage.Namespace;
 
 import java.io.File;
 import java.time.Instant;
@@ -83,7 +84,7 @@ public class JsonMapperValidator {
                         setCreatedAndScheduledDates(new ScheduledState(Instant.now()), Instant.ofEpochSecond(1634248800), Instant.ofEpochSecond(1634245200)),
                         setCreatedAt(new EnqueuedState(), Instant.ofEpochSecond(1634248800)),
                         setCreatedAt(new ProcessingState(UUID.fromString("117bbfcf-e6df-45f0-82a7-b88fd8f96c06")), Instant.ofEpochSecond(1634248900))),
-                new ConcurrentHashMap<>(),
+                new ConcurrentHashMap<>(), Namespace.DEFAULT_NAME
         );
         job.setJobName("Some name");
         return job;

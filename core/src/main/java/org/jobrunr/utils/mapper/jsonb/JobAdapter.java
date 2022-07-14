@@ -3,6 +3,7 @@ package org.jobrunr.utils.mapper.jsonb;
 import org.jobrunr.jobs.Job;
 import org.jobrunr.jobs.JobDetails;
 import org.jobrunr.jobs.states.JobState;
+import org.jobrunr.storage.Namespace;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobDetailsAdapter;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobHistoryAdapter;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobMetadataAdapter;
@@ -50,7 +51,8 @@ public class JobAdapter implements JsonbAdapter<Job, JsonObject> {
                 .add("metadata", jobMetadataAdapter.adaptToJson(job.getMetadata()))
                 .add("jobDetails", jobDetailsAdapter.adaptToJson(job.getJobDetails()))
                 .add("jobHistory", jobHistoryAdapter.adaptToJson(job.getJobStates()))
-                .add("recurringJobId", job.getRecurringJobId().orElse(null));
+                .add("recurringJobId", job.getRecurringJobId().orElse(null))
+                .add("namespace", job.getNamespace());
 
         if (job.getId() != null) {
             builder.add("id", job.getId().toString());
@@ -64,11 +66,12 @@ public class JobAdapter implements JsonbAdapter<Job, JsonObject> {
     public Job adaptFromJson(JsonObject jsonObject) throws Exception {
         final UUID id = jsonObject.isNull("id") ? null : UUID.fromString(jsonObject.getString("id"));
         final int version = jsonObject.getInt("version", 0);
+        final String namespace = jsonObject.getString("namespace", Namespace.DEFAULT_NAME);
         final JobDetails jobDetails = jobDetailsAdapter.adaptFromJson(jsonObject.getJsonObject("jobDetails"));
         final List<JobState> jobHistory = jobHistoryAdapter.adaptFromJson(jsonObject.getJsonArray("jobHistory"));
         final ConcurrentHashMap<String, Object> jobMetadata = jobMetadataAdapter.adaptFromJson(jsonObject.getJsonObject("metadata"));
 
-        final Job job = new Job(id, version, jobDetails, jobHistory, jobMetadata, );
+        final Job job = new Job(id, version, jobDetails, jobHistory, jobMetadata, namespace);
         job.setJobName(jsonObject.getString("jobName"));
         job.setRecurringJobId(jsonObject.containsKey("recurringJobId") && !jsonObject.isNull("recurringJobId") ? jsonObject.getString("recurringJobId") : null);
         return job;

@@ -4,6 +4,7 @@ import org.jobrunr.utils.StringUtils;
 
 public class Namespace {
     private final String name;
+    public static final String DEFAULT_NAME = "default";
 
     private Namespace(String name) {
         this.name = name;
@@ -14,11 +15,7 @@ public class Namespace {
     }
 
     public static Namespace of(String name) {
-        return new Namespace(StringUtils.isNullOrEmpty(name) ? defaultNamespaceName() : name);
-    }
-
-    public static String defaultNamespaceName() {
-        return "default";
+        return new Namespace(StringUtils.isNullOrEmpty(name) ? DEFAULT_NAME : name);
     }
 
     public static String andClause() {
