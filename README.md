@@ -1,3 +1,7 @@
+[ ] add namespace to separate jobs of different microservices
+
+-----
+
 <p align="center">
  <img src="https://user-images.githubusercontent.com/567842/80095933-1181c900-8569-11ea-85e7-14129b3f8142.png" alt="JobRunr logo"></img>
 </p>  
