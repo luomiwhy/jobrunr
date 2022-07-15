@@ -32,7 +32,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.json.bind.Jsonb;
 
 import static java.util.Collections.emptyList;
@@ -50,16 +52,12 @@ import static org.jobrunr.utils.reflection.ReflectionUtils.newInstance;
 @ComponentScan(basePackages = {"org.jobrunr.scheduling"})
 public class JobRunrAutoConfiguration {
 
-    @ConditionalOnProperty(prefix = "org.jobrunr.namespace", name = "enabled", havingValue = "true", matchIfMissing = false)
-    public void namespace(JobRunrProperties properties) {
-        Namespace.of(properties.getNamespace().getName());
-    }
-
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnProperty(prefix = "org.jobrunr.job-scheduler", name = "enabled", havingValue = "true", matchIfMissing = true)
     public JobScheduler jobScheduler(StorageProvider storageProvider, JobRunrProperties properties) {
         final JobDetailsGenerator jobDetailsGenerator = newInstance(properties.getJobScheduler().getJobDetailsGenerator());
+        Namespace.of(properties.getNamespace().getName());
         return new JobScheduler(storageProvider, jobDetailsGenerator, emptyList());
     }
 
