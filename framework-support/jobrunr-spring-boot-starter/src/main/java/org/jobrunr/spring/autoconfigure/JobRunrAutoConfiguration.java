@@ -2,6 +2,7 @@ package org.jobrunr.spring.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import org.jobrunr.configuration.Namespace;
 import org.jobrunr.dashboard.JobRunrDashboardWebServer;
 import org.jobrunr.dashboard.JobRunrDashboardWebServerConfiguration;
 import org.jobrunr.jobs.details.JobDetailsGenerator;
@@ -48,6 +49,11 @@ import static org.jobrunr.utils.reflection.ReflectionUtils.newInstance;
 @EnableConfigurationProperties(JobRunrProperties.class)
 @ComponentScan(basePackages = {"org.jobrunr.scheduling"})
 public class JobRunrAutoConfiguration {
+
+    @ConditionalOnProperty(prefix = "org.jobrunr.namespace", name = "enabled", havingValue = "true", matchIfMissing = false)
+    public void namespace(JobRunrProperties properties) {
+        Namespace.of(properties.getNamespace().getName());
+    }
 
     @Bean
     @ConditionalOnMissingBean

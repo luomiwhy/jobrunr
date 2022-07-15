@@ -180,8 +180,7 @@ public class BackgroundJobServer implements BackgroundJobServerMBean {
                 configuration.pollIntervalInSeconds, configuration.deleteSucceededJobsAfter, configuration.permanentlyDeleteDeletedJobsAfter,
                 firstHeartbeat, Instant.now(), isRunning, jobServerStats.getSystemTotalMemory(), jobServerStats.getSystemFreeMemory(),
                 jobServerStats.getSystemCpuLoad(), jobServerStats.getProcessMaxMemory(), jobServerStats.getProcessFreeMemory(),
-                jobServerStats.getProcessAllocatedMemory(), jobServerStats.getProcessCpuLoad(),
-                configuration.namespace.getName());
+                jobServerStats.getProcessAllocatedMemory(), jobServerStats.getProcessCpuLoad());
     }
 
     public JobZooKeeper getJobZooKeeper() {

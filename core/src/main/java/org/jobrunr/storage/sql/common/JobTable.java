@@ -5,7 +5,7 @@ import org.jobrunr.jobs.mappers.JobMapper;
 import org.jobrunr.jobs.states.ScheduledState;
 import org.jobrunr.jobs.states.StateName;
 import org.jobrunr.storage.ConcurrentJobModificationException;
-import org.jobrunr.storage.Namespace;
+import org.jobrunr.configuration.Namespace;
 import org.jobrunr.storage.PageRequest;
 import org.jobrunr.storage.sql.common.db.ConcurrentSqlModificationException;
 import org.jobrunr.storage.sql.common.db.Sql;
@@ -32,13 +32,11 @@ import static org.jobrunr.utils.reflection.ReflectionUtils.cast;
 
 public class JobTable extends Sql<Job> {
 
-    private final Namespace namespace;
     private final JobMapper jobMapper;
     private static final SqlPageRequestMapper pageRequestMapper = new SqlPageRequestMapper();
 
-    public JobTable(Connection connection, Dialect dialect, String tablePrefix, JobMapper jobMapper, Namespace namespace) {
+    public JobTable(Connection connection, Dialect dialect, String tablePrefix, JobMapper jobMapper) {
         this.jobMapper = jobMapper;
-        this.namespace = namespace;
         this
                 .using(connection, dialect, tablePrefix, "jobrunr_jobs")
                 .withVersion(AbstractJob::getVersion)
@@ -46,7 +44,7 @@ public class JobTable extends Sql<Job> {
                 .with(FIELD_JOB_SIGNATURE, JobUtils::getJobSignature)
                 .with(FIELD_SCHEDULED_AT, job -> job.hasState(StateName.SCHEDULED) ? job.<ScheduledState>getJobState().getScheduledAt() : null)
                 .with(FIELD_RECURRING_JOB_ID, job -> job.getRecurringJobId().orElse(null))
-                .with(FIELD_NAMESPACE, Job::getNamespace);
+                .with(FIELD_NAMESPACE, Namespace.getInstance().getName());
     }
 
     public JobTable withId(UUID id) {
@@ -70,7 +68,7 @@ public class JobTable extends Sql<Job> {
     }
 
     public JobTable withNamespace() {
-        with("namespace", namespace.getName());
+        with("namespace", Namespace.getInstance().getName());
         return this;
     }
 

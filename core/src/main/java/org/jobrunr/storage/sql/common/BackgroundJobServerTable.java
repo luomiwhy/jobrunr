@@ -1,7 +1,7 @@
 package org.jobrunr.storage.sql.common;
 
 import org.jobrunr.storage.BackgroundJobServerStatus;
-import org.jobrunr.storage.Namespace;
+import org.jobrunr.configuration.Namespace;
 import org.jobrunr.storage.ServerTimedOutException;
 import org.jobrunr.storage.StorageException;
 import org.jobrunr.storage.sql.common.db.ConcurrentSqlModificationException;
@@ -21,9 +21,7 @@ import static org.jobrunr.storage.StorageProviderUtils.BackgroundJobServers.*;
 
 public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
 
-    private final Namespace namespace;
-    public BackgroundJobServerTable(Connection connection, Dialect dialect, String tablePrefix, Namespace namespace) {
-        this.namespace = namespace;
+    public BackgroundJobServerTable(Connection connection, Dialect dialect, String tablePrefix) {
         this
                 .using(connection, dialect, tablePrefix, "jobrunr_backgroundjobservers")
                 .with(FIELD_ID, BackgroundJobServerStatus::getId)
@@ -45,7 +43,7 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
     }
 
     public BackgroundJobServerTable withNamespace() {
-        with("namespace", namespace.getName());
+        with("namespace", Namespace.getInstance().getName());
         return this;
     }
 
@@ -129,9 +127,7 @@ public class BackgroundJobServerTable extends Sql<BackgroundJobServerStatus> {
                 resultSet.asLong(FIELD_PROCESS_MAX_MEMORY),
                 resultSet.asLong(FIELD_PROCESS_FREE_MEMORY),
                 resultSet.asLong(FIELD_PROCESS_ALLOCATED_MEMORY),
-                resultSet.asDouble(FIELD_PROCESS_CPU_LOAD),
-                resultSet.asString(FIELD_NAMESPACE)
-                );
+                resultSet.asDouble(FIELD_PROCESS_CPU_LOAD));
     }
 
 

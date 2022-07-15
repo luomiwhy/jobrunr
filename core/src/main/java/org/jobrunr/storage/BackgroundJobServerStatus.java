@@ -1,5 +1,6 @@
 package org.jobrunr.storage;
 
+import org.jobrunr.configuration.Namespace;
 import org.jobrunr.server.jmx.BackgroundJobServerStatusMBean;
 
 import java.time.Duration;
@@ -25,11 +26,11 @@ public class BackgroundJobServerStatus implements BackgroundJobServerStatusMBean
     private final Double processCpuLoad;
     private final String namespace;
 
-    public BackgroundJobServerStatus(int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, String namespace) {
-        this(UUID.randomUUID(), workerPoolSize, pollIntervalInSeconds, deleteSucceededJobsAfter, permanentlyDeleteDeletedJobsAfter, null, null, false, null, null, null, null, null, null, null, namespace);
+    public BackgroundJobServerStatus(int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter) {
+        this(UUID.randomUUID(), workerPoolSize, pollIntervalInSeconds, deleteSucceededJobsAfter, permanentlyDeleteDeletedJobsAfter, null, null, false, null, null, null, null, null, null, null);
     }
 
-    public BackgroundJobServerStatus(UUID id, int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, Instant firstHeartbeat, Instant lastHeartbeat, boolean isRunning, Long systemTotalMemory, Long systemFreeMemory, Double systemCpuLoad, Long processMaxMemory, Long processFreeMemory, Long processAllocatedMemory, Double processCpuLoad, String namespace) {
+    public BackgroundJobServerStatus(UUID id, int workerPoolSize, int pollIntervalInSeconds, Duration deleteSucceededJobsAfter, Duration permanentlyDeleteDeletedJobsAfter, Instant firstHeartbeat, Instant lastHeartbeat, boolean isRunning, Long systemTotalMemory, Long systemFreeMemory, Double systemCpuLoad, Long processMaxMemory, Long processFreeMemory, Long processAllocatedMemory, Double processCpuLoad) {
         this.id = id;
         this.workerPoolSize = workerPoolSize;
         this.pollIntervalInSeconds = pollIntervalInSeconds;
@@ -45,7 +46,7 @@ public class BackgroundJobServerStatus implements BackgroundJobServerStatusMBean
         this.processFreeMemory = processFreeMemory;
         this.processAllocatedMemory = processAllocatedMemory;
         this.processCpuLoad = processCpuLoad;
-        this.namespace = namespace;
+        this.namespace = Namespace.getInstance().getName();
     }
 
     @Override

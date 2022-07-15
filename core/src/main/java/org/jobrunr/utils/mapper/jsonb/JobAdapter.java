@@ -3,7 +3,7 @@ package org.jobrunr.utils.mapper.jsonb;
 import org.jobrunr.jobs.Job;
 import org.jobrunr.jobs.JobDetails;
 import org.jobrunr.jobs.states.JobState;
-import org.jobrunr.storage.Namespace;
+import org.jobrunr.configuration.Namespace;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobDetailsAdapter;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobHistoryAdapter;
 import org.jobrunr.utils.mapper.jsonb.adapters.JobMetadataAdapter;

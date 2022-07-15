@@ -23,6 +23,8 @@ public class JobRunrProperties {
 
     private Miscellaneous miscellaneous = new Miscellaneous();
 
+    private Namespace namespace = new Namespace();
+
     public Database getDatabase() {
         return database;
     }
@@ -69,6 +71,14 @@ public class JobRunrProperties {
 
     public void setMiscellaneous(Miscellaneous miscellaneous) {
         this.miscellaneous = miscellaneous;
+    }
+
+    public Namespace getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(Namespace namespace) {
+        this.namespace = namespace;
     }
 
     /**
@@ -400,6 +410,18 @@ public class JobRunrProperties {
 
         public void setAllowAnonymousDataUsage(boolean allowAnonymousDataUsage) {
             this.allowAnonymousDataUsage = allowAnonymousDataUsage;
+        }
+    }
+
+    public static class Namespace {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

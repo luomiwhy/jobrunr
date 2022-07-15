@@ -12,6 +12,7 @@ public abstract class AbstractJob implements Lockable {
     private String jobSignature;
     private String jobName;
     private JobDetails jobDetails;
+    private String namespace;
 
     protected AbstractJob() {
         // used for deserialization
@@ -62,6 +63,14 @@ public abstract class AbstractJob implements Lockable {
 
     public JobDetails getJobDetails() {
         return jobDetails;
+    }
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     @Override

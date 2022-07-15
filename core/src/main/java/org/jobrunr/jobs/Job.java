@@ -59,6 +59,10 @@ public class Job extends AbstractJob {
         this.jobHistory = new ArrayList<>(jobHistory);
         this.metadata = metadata;
     }
+    public Job(UUID id, int version, JobDetails jobDetails, List<JobState> jobHistory, ConcurrentMap<String, Object> metadata, String namespace) {
+        this(id, version, jobDetails, jobHistory, metadata);
+        this.setNamespace(namespace);
+    }
 
     @Override
     public UUID getId() {
