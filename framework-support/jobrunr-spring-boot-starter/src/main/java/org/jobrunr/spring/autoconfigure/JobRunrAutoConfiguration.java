@@ -75,6 +75,7 @@ public class JobRunrAutoConfiguration {
         final BackgroundJobServer backgroundJobServer = new BackgroundJobServer(storageProvider, jobRunrJsonMapper, jobActivator, backgroundJobServerConfiguration);
         backgroundJobServer.setJobFilters(singletonList(new RetryFilter(properties.getJobs().getDefaultNumberOfRetries(), properties.getJobs().getRetryBackOffTimeSeed())));
         backgroundJobServer.start();
+        Namespace.of(properties.getNamespace().getName());
         return backgroundJobServer;
     }
 
